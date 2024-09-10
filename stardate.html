@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador e Relógio com Animação</title>
+    <style>
+        @font-face {
+            font-family: 'Unnamed1-Regular';
+            src: url('C:/Users/Hayan/Desktop/StarDate/fonts/Unnamed1-Regular.ttf');
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('C:/Users/Hayan/Downloads/ma721 (1).png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Unnamed1-Regular', sans-serif;
+            color: #ECB757;
+            text-align: center;
+            position: relative;
+            text-shadow: 
+        0 0 2px #EDB433,   /* Desfoque sutil interno */
+        0 0 4px rgba(237, 180, 51, 0.5);
+        }
+
+        #counter {
+    font-size: 142px; /* Ajuste o tamanho conforme necessário */
+    animation: fade 0.2s ease-in-out;
+    position: absolute;
+    top: 315px; 
+    left: 227px;
+}
+
+#clock {
+    font-size: 142px; /* Ajuste o tamanho conforme necessário */
+    animation: fade 0.2s ease-in-out;
+    position: absolute;
+    top: 319px; 
+    left: 805px;
+}
+
+#stardate-counter {
+    font-size: 120px; /* Ajuste o tamanho conforme necessário */
+    animation: fade 0.2s ease-in-out;
+    position: absolute;
+    top: 330px; 
+    left: 187px;
+}
+
+        .hidden {
+            display: none; /* Classe para ocultar elementos */
+        }
+
+        @keyframes fade {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="counter" class="hidden">0000.0</div>
+    <div id="clock">00:00:00</div>
+    <div id="stardate-counter">0000000.0</div>
+
+    <script>
+        // Counter
+        let count = 0;
+        const counterElement = document.getElementById('counter');
+
+        function updateCounter() {
+            count += 1;
+            let integerPart = Math.floor(count / 10);
+            let decimalPart = count % 10;
+
+            if (integerPart > 9999) {
+                integerPart = 0;
+                count = 0;
+            }
+
+            counterElement.textContent = `${integerPart.toString().padStart(4, '0')}.${decimalPart}`;
+            applyFade(counterElement);
+        }
+
+        // Clock
+        let hours = 0, minutes = 0, seconds = 0;
+        const clockElement = document.getElementById('clock');
+
+        function updateClock() {
+            seconds += 1;
+            if (seconds === 60) {
+                seconds = 0;
+                minutes += 1;
+            }
+            if (minutes === 60) {
+                minutes = 0;
+                hours += 1;
+            }
+            if (hours === 100) {
+                hours = 0;
+            }
+            clockElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            applyFade(clockElement);
+        }
+
+        // Stardate Counter
+        const stardateCounterElement = document.getElementById('stardate-counter');
+
+        function calculateStardate(dateObj) {
+            const referenceStardate = -2315840.0; // Stardate padrão para hoje (exemplo)
+            const referenceDate = new Date(Date.UTC(2000, 0, 1)); // Referência fixa (1 de Janeiro de 2000)
+
+            const timeDifference = dateObj - referenceDate;
+            const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+
+            const stardateIncrementPerDay = 1; // Incremento de um stardate por dia
+
+            const stardate = referenceStardate + daysDifference * stardateIncrementPerDay;
+
+            return stardate.toFixed(1);
+        }
+
+        function updateStardateCounter() {
+            const currentDate = new Date();
+            const stardate = calculateStardate(currentDate);
+            stardateCounterElement.textContent = stardate.padStart(8, '0'); // Formato 0000000.0
+            applyFade(stardateCounterElement);
+        }
+
+        function applyFade(element) {
+            element.style.animation = 'none';
+            setTimeout(() => {
+                element.style.animation = '';
+            }, 10);
+        }
+
+        // Função para alternar visibilidade a cada 10 segundos
+        function toggleVisibility() {
+            if (counterElement.classList.contains('hidden')) {
+                counterElement.classList.remove('hidden');
+                stardateCounterElement.classList.add('hidden');
+            } else {
+                counterElement.classList.add('hidden');
+                stardateCounterElement.classList.remove('hidden');
+            }
+        }
+
+        // Atualizar contadores e relógio a cada segundo
+        setInterval(updateCounter, 1000);
+        setInterval(updateClock, 1000);
+        setInterval(updateStardateCounter, 86400000); // Atualiza a cada dia (86400000 ms)
+        updateStardateCounter(); // Atualiza imediatamente ao carregar
+
+        // Alternar visibilidade a cada 10 segundos
+        setInterval(toggleVisibility, 10000); // 10000 ms = 10 segundos
+    </script>
+</body>
+</html>
